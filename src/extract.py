@@ -1,4 +1,5 @@
 import numpy as np
+import subprocess
 
 POS_X = 0
 POS_Y = 1
@@ -22,13 +23,31 @@ def get_particle_attribute(particles, attribute):
         retrieved_attribute[i] = particles[i][attribute]
     return retrieved_attribute
 
+N = 10
+inputFile = "Nbody/input_data/ellipse_N_00010.gal"
+outputFile = "outputs/out.gal"
 
-snopp = get_particle_data(np.fromfile("Nbody/input_data/circles_N_4.gal",dtype=float))
-#snopp = get_particle_data(np.fromfile("outputs/out.data",dtype=float))
+snopp = get_particle_data(np.fromfile(inputFile, dtype=float))
+
+for i in range(N):
+    #take some steps
+    snopp = snopp
 
 print(snopp)
-# pos_x = get_particle_attribute(snopp, POS_X)
 
-# print(pos_x)
+output = snopp.tofile(outputFile)
 
-output = snopp.tofile("outputs/out.data")
+result = subprocess.run(
+    [
+        "Nbody/compare_gal_files/compare_gal_files",
+        str(N),
+        inputFile,
+        outputFile
+    ],
+    capture_output=True,
+    text=True
+)
+
+print("stdout:", result.stdout)
+print("stderr:", result.stderr)
+print("return code:", result.returncode)
