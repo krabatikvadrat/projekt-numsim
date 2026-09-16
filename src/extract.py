@@ -23,7 +23,7 @@ def get_particle_attribute(particles, attribute):
         retrieved_attribute[i] = particles[i][attribute]
     return retrieved_attribute
 
-inputFile = "Nbody/input_data/ellipse_N_00010.gal"
+inputFile = "Nbody/input_data/circles_N_2.gal"
 outputFile = "outputs/out.gal"
 
 N, snopp = get_particle_data(np.fromfile(inputFile, dtype=float))
@@ -32,7 +32,7 @@ for i in range(N):
     #take some steps
     snopp = snopp
 
-print(snopp)
+#print(snopp)
 
 output = snopp.tofile(outputFile)
 
