@@ -9,7 +9,7 @@ inputFile = "Nbody/input_data/ellipse_N_00100.gal"
 outputFile = "outputs/out.gal"
 compareFile = "Nbody/ref_output_data/ellipse_N_00100_after200steps.gal"
 
-NUM_STEPS = 20000
+NUM_STEPS = 200
 
 # If True just runns it
 # If False shows the animation and saves it as a mp4
@@ -18,8 +18,7 @@ just_run_it = False
 # If the compare script shuld be run
 compare_output = False
 
-
-# extra parameters
+# extra parameters/outputs/*
 
 TIMESTEP = 1e-5
 
