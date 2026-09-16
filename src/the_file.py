@@ -1,5 +1,27 @@
 import numpy as np
 import subprocess
+import time
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib.animation import FFMpegWriter
+
+inputFile = "Nbody/input_data/ellipse_N_00100.gal"
+outputFile = "outputs/out.gal"
+compareFile = "Nbody/ref_output_data/ellipse_N_00100_after200steps.gal"
+
+NUM_STEPS = 20000
+
+# If True just runns it
+# If False shows the animation and saves it as a mp4
+just_run_it = False
+
+# If the compare script shuld be run
+compare_output = False
+
+
+# extra parameters
+
+TIMESTEP = 1e-5
 
 #Extract
 
@@ -25,25 +47,13 @@ def get_particle_attribute(particles, attribute):
         retrieved_attribute[i] = particles[i][attribute]
     return retrieved_attribute
 
-inputFile = "Nbody/input_data/ellipse_N_00010.gal"
-outputFile = "outputs/out.gal"
-compareFile = "Nbody/ref_output_data/ellipse_N_00010_after200steps.gal"
-
 N, particles = get_particle_data(np.fromfile(inputFile, dtype=float))
-# print("Input:")
-# print(snopp)
-
-# N1, comp = get_particle_data(np.fromfile(compareFile, dtype=float))
-# print("Compare:")
-# print(comp)
 
 #Calc short for calculator
 #trut /\
 
 EPSILON = 1e-3
-TIMESTEP = 1e-5
 G = 100 / N
-NUM_STEPS = 200
 
 e_x = np.array([1,0])
 e_y = np.array([0,1])
@@ -69,13 +79,13 @@ def The_Force_Luke(i): #THE KRAAAAAAFT
             sum_vec += (m[j] / (distance(i, j) + EPSILON) ** 3) * distance_vector(i,j)
     return np.multiply(-G * m[i], sum_vec)
 
-def current_acc(i): # calc is short for calulate acc is short for vroooooooom
+def current_acc(i): # current is short for calulate acc is short for vroooooooom
     return np.divide(The_Force_Luke(i), m[i])
 
-def next_vel(i): # calc is short for calulate vel is short for velocity
+def next_vel(i): # next is short for calulate vel is short for velocity
     return vel[i] + np.multiply(TIMESTEP, current_acc(i))
 
-def next_pos(i): # calc is short for calulate pos is short for possistion
+def next_pos(i): # next is short for calulate pos is short for possistion
     return pos[i] + np.multiply(TIMESTEP, next_vel(i))
 
 
@@ -91,15 +101,8 @@ def step():
     vel = next_vel_arr
     pos = next_pos_arr
 
-def just_run_it_bro():
-    for i in range(NUM_STEPS):
-        step()
-
 
 #Animate
-
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
 def animate():
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -114,10 +117,17 @@ def animate():
         scat.set_offsets(pos)
         return scat,
 
-    ani = animation.FuncAnimation(fig, update, frames=NUM_STEPS, interval=30, blit=True, repeat=False)
+    ani = animation.FuncAnimation(
+        fig,
+        update,
+        frames=NUM_STEPS,
+        interval=30,
+        blit=True,
+        repeat=False,
+    )
+    writer = FFMpegWriter(fps=30, bitrate=1800)
+    ani.save("outputs/nbody.mp4", writer=writer)
     plt.show()
-
-import time
 
 def just_run_it_bro():
     time_abs_start = time.time()
@@ -131,28 +141,33 @@ def just_run_it_bro():
     time_abs_end = time.time()
     print("total time: ", time_abs_end-time_abs_start)
 
-#animate()
-just_run_it_bro()
 
-out = np.column_stack((pos, m, vel, brightnesses))
-#print("Output:")
-#print(out)
+if just_run_it:
+    just_run_it_bro()
+else:
+    animate()
 
-#Compare output
 
-out.tofile(outputFile)
+if compare_output:
+    out = np.column_stack((pos, m, vel, brightnesses))
+    #print("Output:")
+    #print(out)
 
-result = subprocess.run(
-    [
-        "Nbody/compare_gal_files/compare_gal_files",
-        str(N),
-        compareFile,
-        outputFile
-    ],
-    capture_output=True,
-    text=True
-)
+    #Compare output
 
-print("stdout:", result.stdout)
-print("stderr:", result.stderr)
-print("return code:", result.returncode)
+    out.tofile(outputFile)
+
+    result = subprocess.run(
+        [
+            "Nbody/compare_gal_files/compare_gal_files",
+            str(N),
+            compareFile,
+            outputFile
+        ],
+        capture_output=True,
+        text=True
+    )
+
+    print("stdout:", result.stdout)
+    print("stderr:", result.stderr)
+    print("return code:", result.returncode)
