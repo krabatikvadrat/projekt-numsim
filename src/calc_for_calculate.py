@@ -28,18 +28,11 @@ def The_Force_Luke(i): #THE KRAAAAAAFT
             sum_vec += (m[j] / np.pow(distance(i, j) + EPSILON, 3)) * distance_vector(i,j)
     return -G*m[i] * sum_vec
 
-def acc(i):
+def current_acc(i): # calc is short for calulate acc is short for vroooooooom
     return The_Force_Luke(i) / m[i]
 
-# n is the time t change name later 
-def calc_vel_x(): # calc_is_short_for_calculator_vel_is_short_for_velosity_x
-    x_vel[i, n+1] = x_vel[i] + TIMESTEP*acc_x(i)
+def next_vel(i): # calc is short for calulate vel is short for velocity
+    return vel[i] + TIMESTEP * current_acc(i)
 
-def calc_vel_y(): # calc_is_short_for_calculator_vel_is_short_for_velosity_y
-    y_vel[i, n+1] = y_vel[i] + TIMESTEP*acc_y(i)
-
-def calc_pos_x(): # calc_is_short_for_calculator_vel_is_short_for_possistion_x
-    x_pos[i, n+1] = x_pos[i] + TIMESTEP*vel_x[i, n+1]
-
-def calc_pos_y(): # calc_is_short_for_calculator_vel_is_short_for_possistion_y
-    y_pos[i, n+1] = x_pos[i] + TIMESTEP*vel_y[i, n+1]
+def next_pos(i): # calc is short for calulate pos is short for possistion
+    return pos[i] + TIMESTEP * next_vel(i)
