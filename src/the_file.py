@@ -26,27 +26,26 @@ def get_particle_attribute(particles, attribute):
         retrieved_attribute[i] = particles[i][attribute]
     return retrieved_attribute
 
-inputFile = "Nbody/input_data/ellipse_N_00010.gal"
+inputFile = "Nbody/input_data/ellipse_N_00100.gal"
 outputFile = "outputs/out.gal"
-compareFile = "Nbody/ref_output_data/ellipse_N_00010_after200steps.gal"
+compareFile = "Nbody/ref_output_data/ellipse_N_00100_after200steps.gal"
 
-N, snopp = get_particle_data(np.fromfile(inputFile, dtype=float))
-print("Input:")
-print(snopp)
+N, particles = get_particle_data(np.fromfile(inputFile, dtype=float))
+# print("Input:")
+# print(snopp)
 
-N1, comp = get_particle_data(np.fromfile(compareFile, dtype=float))
-print("Compare:")
-print(comp)
+# N1, comp = get_particle_data(np.fromfile(compareFile, dtype=float))
+# print("Compare:")
+# print(comp)
 
 #Calc short for calculator
 #trut /\
 
-EPSILON = 10e-3
-TIMESTEP = 10e-5
+EPSILON = 1e-3
+TIMESTEP = 1e-5
 G = 100 / N
 NUM_STEPS = 200
 
-particles = snopp
 e_x = np.array([1,0])
 e_y = np.array([0,1])
 
@@ -119,18 +118,37 @@ def animate():
     ani = animation.FuncAnimation(fig, update, frames=NUM_STEPS, interval=30, blit=True, repeat=False)
     plt.show()
 
-def just_run_it_bro():
-    for i in range(NUM_STEPS):
-        step()
+import time
 
-just_run_it_bro()
+def just_run_it_bro():
+    time_abs_start = time.time()
+    for i in range(NUM_STEPS):
+        # print("now running step: ", i)
+        # time_start = time.time()
+        step()
+        # time_end = time.time()
+        # time_took = time_end-time_start
+        # print("step 0 took ", time_took, " seconds")
+    time_abs_end = time.time()
+    print("total time: ", time_abs_end-time_abs_start)
+
+animate()
+#just_run_it_bro()
 # print(pos[:, 0])
 # print(pos[:, 1])
 
 out = np.column_stack((pos, m, vel, brightnesses))
-print("Output:")
-print(out)
+# print("Output:")
+# print(out)
 
+
+print(vel)
+
+_, test = get_particle_data(np.fromfile(compareFile, dtype=float))
+test_vel = np.column_stack((get_particle_attribute(test, VEL_X), 
+                            get_particle_attribute(test, VEL_Y)))
+
+print(test_vel)
 
 #Compare output
 
