@@ -1,6 +1,5 @@
 import numpy as np
 import subprocess
-import math
 
 #Extract
 
@@ -26,9 +25,9 @@ def get_particle_attribute(particles, attribute):
         retrieved_attribute[i] = particles[i][attribute]
     return retrieved_attribute
 
-inputFile = "Nbody/input_data/ellipse_N_00100.gal"
+inputFile = "Nbody/input_data/ellipse_N_00010.gal"
 outputFile = "outputs/out.gal"
-compareFile = "Nbody/ref_output_data/ellipse_N_00100_after200steps.gal"
+compareFile = "Nbody/ref_output_data/ellipse_N_00010_after200steps.gal"
 
 N, particles = get_particle_data(np.fromfile(inputFile, dtype=float))
 # print("Input:")
@@ -81,16 +80,6 @@ def next_pos(i): # calc is short for calulate pos is short for possistion
 
 
 #Simulate
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-
-
-
-
-# print(pos)
-# print(vel)
-
-
 
 def step():
     global pos, vel
@@ -100,7 +89,17 @@ def step():
         next_vel_arr[n] = next_vel(n)
         next_pos_arr[n] = next_pos(n)
     vel = next_vel_arr
-    pos = next_pos_arr 
+    pos = next_pos_arr
+
+def just_run_it_bro():
+    for i in range(NUM_STEPS):
+        step()
+
+
+#Animate
+
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 def animate():
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -133,22 +132,11 @@ def just_run_it_bro():
     print("total time: ", time_abs_end-time_abs_start)
 
 animate()
-#just_run_it_bro()
-# print(pos[:, 0])
-# print(pos[:, 1])
+
 
 out = np.column_stack((pos, m, vel, brightnesses))
-# print("Output:")
-# print(out)
-
-
-print(vel)
-
-_, test = get_particle_data(np.fromfile(compareFile, dtype=float))
-test_vel = np.column_stack((get_particle_attribute(test, VEL_X), 
-                            get_particle_attribute(test, VEL_Y)))
-
-print(test_vel)
+#print("Output:")
+#print(out)
 
 #Compare output
 
@@ -168,4 +156,3 @@ result = subprocess.run(
 print("stdout:", result.stdout)
 print("stderr:", result.stderr)
 print("return code:", result.returncode)
-
