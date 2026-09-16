@@ -131,8 +131,8 @@ def just_run_it_bro():
     time_abs_end = time.time()
     print("total time: ", time_abs_end-time_abs_start)
 
-animate()
-
+#animate()
+just_run_it_bro()
 
 out = np.column_stack((pos, m, vel, brightnesses))
 #print("Output:")

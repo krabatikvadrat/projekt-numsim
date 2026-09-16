@@ -1,5 +1,5 @@
 import numpy as np
-import extract as ext
+import old.extract as ext
 EPSILON = 10e-3
 TIMESTEP = 10e-5
 G = 100 / ext.N
