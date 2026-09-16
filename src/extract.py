@@ -15,7 +15,7 @@ def get_particle_data(particles_data):
     for i in range(len(particle_arr)):
         start = 6 * i
         particle_arr[i] = particles_data[start: start + 6]
-    return particle_arr
+    return number_of_particles, particle_arr
 
 def get_particle_attribute(particles, attribute):
     retrieved_attribute = np.zeros(len(particles))
@@ -23,11 +23,10 @@ def get_particle_attribute(particles, attribute):
         retrieved_attribute[i] = particles[i][attribute]
     return retrieved_attribute
 
-N = 10
 inputFile = "Nbody/input_data/ellipse_N_00010.gal"
 outputFile = "outputs/out.gal"
 
-snopp = get_particle_data(np.fromfile(inputFile, dtype=float))
+N, snopp = get_particle_data(np.fromfile(inputFile, dtype=float))
 
 for i in range(N):
     #take some steps
