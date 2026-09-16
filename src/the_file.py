@@ -25,10 +25,17 @@ def get_particle_attribute(particles, attribute):
         retrieved_attribute[i] = particles[i][attribute]
     return retrieved_attribute
 
-inputFile = "Nbody/input_data/circles_N_2.gal"
+inputFile = "Nbody/input_data/ellipse_N_00010.gal"
 outputFile = "outputs/out.gal"
+compareFile = "Nbody/ref_output_data/ellipse_N_00010_after200steps.gal"
 
 N, snopp = get_particle_data(np.fromfile(inputFile, dtype=float))
+print("Input:")
+print(snopp)
+
+N1, comp = get_particle_data(np.fromfile(compareFile, dtype=float))
+print("Compare:")
+print(comp)
 
 #Calc short for calculator
 #trut /\
@@ -36,16 +43,17 @@ N, snopp = get_particle_data(np.fromfile(inputFile, dtype=float))
 EPSILON = 10e-3
 TIMESTEP = 10e-5
 G = 100 / N
+NUM_STEPS = 200
 
 particles = snopp
 e_x = np.array([1,0])
 e_y = np.array([0,1])
 
 pos = np.column_stack((get_particle_attribute(particles, POS_X), 
-                             get_particle_attribute(particles, POS_Y)))
+                            get_particle_attribute(particles, POS_Y)))
 m = get_particle_attribute(particles, MASS)
 vel = np.column_stack((get_particle_attribute(particles, VEL_X), 
-                             get_particle_attribute(particles, VEL_Y)))
+                            get_particle_attribute(particles, VEL_Y)))
 brightnesses = get_particle_attribute(particles, BRIGHTNESS)
 
 def distance(i, j): # smala r
@@ -75,19 +83,49 @@ def next_pos(i): # calc is short for calulate pos is short for possistion
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-solution = solve_ivp
+next_vel_arr = np.zeros([N, 2])
+next_pos_arr = np.zeros([N, 2])
+
+# print(pos)
+# print(vel)
+
+for s in range(NUM_STEPS):
+    for n in range(N):
+        next_vel_arr[n] = next_vel(n)
+        next_pos_arr[n] = next_pos(n)
+    vel = next_vel_arr
+    pos = next_pos_arr 
 
 
+# print(pos[:, 0])
+# print(pos[:, 1])
+
+out = np.column_stack((pos, m, vel, brightnesses))
+print("Output:")
+print(out)
+
+
+
+#plt.grid(True)
+plt.ion()
+plt.xlim(0, 1)
+plt.ylim(0, 1)
+
+plt.plot([0,1])
+
+plt.show()
+
+plt.savefig("show.png")
 
 #Compare output
 
-output = snopp.tofile(outputFile)
+out.tofile(outputFile)
 
 result = subprocess.run(
     [
         "Nbody/compare_gal_files/compare_gal_files",
         str(N),
-        inputFile,
+        compareFile,
         outputFile
     ],
     capture_output=True,

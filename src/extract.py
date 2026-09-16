@@ -28,12 +28,6 @@ outputFile = "outputs/out.gal"
 
 N, snopp = get_particle_data(np.fromfile(inputFile, dtype=float))
 
-for i in range(N):
-    #take some steps
-    snopp = snopp
-
-#print(snopp)
-
 output = snopp.tofile(outputFile)
 
 result = subprocess.run(
