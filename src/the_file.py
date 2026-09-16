@@ -1,5 +1,6 @@
 import numpy as np
 import subprocess
+import math
 
 #Extract
 
@@ -66,7 +67,8 @@ def The_Force_Luke(i): #THE KRAAAAAAFT
     sum_vec = np.zeros(2)
     for j in range(N):
         if j != i:
-            sum_vec += (m[j] / np.pow(distance(i, j) + EPSILON, 3)) * distance_vector(i,j)
+            #sum_vec += (m[j] / math.pow(distance(i, j) + EPSILON, 3)) * distance_vector(i,j)
+            sum_vec += (m[j] / (distance(i, j) + EPSILON) ** 3) * distance_vector(i,j)
     return np.multiply(-G * m[i], sum_vec)
 
 def current_acc(i): # calc is short for calulate acc is short for vroooooooom
@@ -81,22 +83,47 @@ def next_pos(i): # calc is short for calulate pos is short for possistion
 
 #Simulate
 import matplotlib.pyplot as plt
-from scipy.integrate import solve_ivp
+import matplotlib.animation as animation
 
-next_vel_arr = np.zeros([N, 2])
-next_pos_arr = np.zeros([N, 2])
+
+
 
 # print(pos)
 # print(vel)
 
-for s in range(NUM_STEPS):
+
+
+def step():
+    global pos, vel
+    next_vel_arr = np.zeros([N, 2])
+    next_pos_arr = np.zeros([N, 2])
     for n in range(N):
         next_vel_arr[n] = next_vel(n)
         next_pos_arr[n] = next_pos(n)
     vel = next_vel_arr
     pos = next_pos_arr 
 
+def animate():
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.set_facecolor('black')
+    scat = ax.scatter(pos[:, 0], pos[:, 1], s=brightnesses * 5, c='white')
+    ax.set_xlim(pos[:,0].min() - 0.5, pos[:,0].max() + 0.5)
+    ax.set_ylim(pos[:,1].min() - 0.5, pos[:,1].max() + 0.5)
+    ax.set_aspect('equal')
 
+    def update(frame):
+        step()
+        scat.set_offsets(pos)
+        return scat,
+
+    ani = animation.FuncAnimation(fig, update, frames=NUM_STEPS, interval=30, blit=True, repeat=False)
+    plt.show()
+
+def just_run_it_bro():
+    for i in range(NUM_STEPS):
+        step()
+
+just_run_it_bro()
 # print(pos[:, 0])
 # print(pos[:, 1])
 
@@ -104,18 +131,6 @@ out = np.column_stack((pos, m, vel, brightnesses))
 print("Output:")
 print(out)
 
-
-
-#plt.grid(True)
-plt.ion()
-plt.xlim(0, 1)
-plt.ylim(0, 1)
-
-plt.plot([0,1])
-
-plt.show()
-
-plt.savefig("show.png")
 
 #Compare output
 
