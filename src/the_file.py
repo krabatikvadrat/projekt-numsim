@@ -5,22 +5,23 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.animation import FFMpegWriter
 
-inputFile = "Nbody/input_data/ellipse_N_00100.gal"
+inputFile = "Nbody/input_data/ellipse_N_00010.gal"
 outputFile = "outputs/out.gal"
-compareFile = "Nbody/ref_output_data/ellipse_N_00100_after200steps.gal"
+compareFile = "Nbody/ref_output_data/ellipse_N_00010_after200steps.gal"
 
-NUM_STEPS = 200
+NUM_STEPS = 20000
 
-# If True just runns it
-# If False shows the animation and saves it as a mp4
-just_run_it = False
+# If 0 just runns it
+# If 1 saves the animation as a mp4
+# IF 2 shows the animation
+What_to_do = 1
 
 # If the compare script shuld be run
 compare_output = False
 
 # extra parameters/outputs/*
 
-TIMESTEP = 1e-5
+TIMESTEP = 1e-6
 
 #Extract
 
@@ -30,6 +31,7 @@ MASS = 2
 VEL_X = 3
 VEL_Y = 4
 BRIGHTNESS = 5
+step_counter = 0
 
 def get_particle_data(particles_data): 
     number_of_particles = round(len(particles_data) / 6)
@@ -112,21 +114,34 @@ def animate():
     ax.set_aspect('equal')
 
     def update(frame):
+        global step_counter
+        start_time = time.time()
         step()
+        print("step", step_counter, "in",time.time()-start_time, "seconds")
+        step_counter += 1 
+        scat.set_offsets(pos)
+        return scat,
+
+    def init():
         scat.set_offsets(pos)
         return scat,
 
     ani = animation.FuncAnimation(
         fig,
         update,
-        frames=NUM_STEPS,
+        init_func=init,
+        frames=range(NUM_STEPS),
         interval=30,
         blit=True,
         repeat=False,
     )
-    writer = FFMpegWriter(fps=30, bitrate=1800)
-    ani.save("outputs/nbody.mp4", writer=writer)
-    plt.show()
+
+    if What_to_do == 1:
+        writer = FFMpegWriter(fps=60, bitrate=1800)
+        ani.save("outputs/nbody.mp4", writer=writer)
+
+    elif What_to_do == 2:
+        plt.show()
 
 def just_run_it_bro():
     time_abs_start = time.time()
@@ -141,7 +156,7 @@ def just_run_it_bro():
     print("total time: ", time_abs_end-time_abs_start)
 
 
-if just_run_it:
+if What_to_do == 0:
     just_run_it_bro()
 else:
     animate()

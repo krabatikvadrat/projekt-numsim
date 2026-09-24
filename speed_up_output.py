@@ -47,11 +47,11 @@ def main() -> int:
 		"output",
 		type=Path,
 		nargs="?",
-		help="Path for the converted MP4 (default: outputs/nbody_60fps.mp4)",
+		help="Path for the converted MP4 (default: outputs/nbody_10x_speed.mp4)",
 	)
 	args = parser.parse_args()
 
-	output_path = args.output or Path(__file__).resolve().parent / "outputs" / "nbody_60fps.mp4"
+	output_path = args.output or Path(__file__).resolve().parent / "outputs" / "nbody_10x_speed.mp4"
 
 	try:
 		convert_to_60fps(args.input, output_path)
