@@ -17,7 +17,7 @@ compareFile = "Nbody/ref_output_data/ellipse_N_00010_after200steps.gal"
 # If 0 just runs it
 # If 1 saves the animation as a mp4
 # IF 2 shows the animation
-What_to_do = 0
+What_to_do = 2
 
 # If the compare script shuld be run
 compare_output = True
@@ -84,6 +84,7 @@ def distance_vector(i, j): # Distance vector from between particle i and j
     return pos[i] - pos[j]
 
 def The_Force_Luke(i): # The force from all other particles onto i
+    sum_vec = np.zeros(2)
     for j in range(N):
         if j != i:
             sum_vec += (m[j] / (distance(i, j) + EPSILON) ** 3) * distance_vector(i,j)
