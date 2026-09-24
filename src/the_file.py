@@ -5,43 +5,51 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.animation import FFMpegWriter
 
+#PART 0: Parameters of the simulation
+
+#Path to file to use as initial conditions
 inputFile = "Nbody/input_data/ellipse_N_00010.gal"
+#Name of the file to create containing the final set of vales
 outputFile = "outputs/out.gal"
+#Path to the file used to compare the output file with
 compareFile = "Nbody/ref_output_data/ellipse_N_00010_after200steps.gal"
 
-NUM_STEPS = 20000
-
-# If 0 just runns it
+# If 0 just runs it
 # If 1 saves the animation as a mp4
 # IF 2 shows the animation
-What_to_do = 1
+What_to_do = 0
 
 # If the compare script shuld be run
-compare_output = False
+compare_output = True
 
-# extra parameters/outputs/*
+#The total number of steps to take
+NUM_STEPS = 200
+# The time step in seconds
+TIMESTEP = 1e-5
 
-TIMESTEP = 1e-6
 
-#Extract
+#PART 1: Extracting the file
 
+#When extracting the input file, the below attributes are used to parse the corresponding column
 POS_X = 0
 POS_Y = 1
 MASS = 2
 VEL_X = 3
 VEL_Y = 4
 BRIGHTNESS = 5
-step_counter = 0
 
+#Given a raw input array of N * 6 elements, returns the number of particles (N) and places each particles data into its own column in particle_arr
 def get_particle_data(particles_data): 
     number_of_particles = round(len(particles_data) / 6)
     particle_arr = np.zeros((number_of_particles, 6), dtype=float)
-    #take 6 elements of particles_data at a time and put into each index of particles_arr
+
+    #Take 6 elements of particles_data at a time and put into each index of particles_arr
     for i in range(len(particle_arr)):
         start = 6 * i
         particle_arr[i] = particles_data[start: start + 6]
     return number_of_particles, particle_arr
 
+#Given an array of particle data and an index between 0 and 5, returnes the attribute associated with said index
 def get_particle_attribute(particles, attribute):
     retrieved_attribute = np.zeros(len(particles))
     for i in range(len(particles)):
@@ -50,49 +58,50 @@ def get_particle_attribute(particles, attribute):
 
 N, particles = get_particle_data(np.fromfile(inputFile, dtype=float))
 
-#Calc short for calculator
-#trut /\
 
+#PART 2: Constants, initial values and equations used for the calculation
+
+#A constant used to cap the max force between two particles, keeping the simulation smooth
 EPSILON = 1e-3
+#Gravity scales inversely with the number of bodies
 G = 100 / N
 
-e_x = np.array([1,0])
-e_y = np.array([0,1])
-
+#2D array of initial positions
 pos = np.column_stack((get_particle_attribute(particles, POS_X), 
                             get_particle_attribute(particles, POS_Y)))
+#1D array of masses
 m = get_particle_attribute(particles, MASS)
+#2D array of initial velocities
 vel = np.column_stack((get_particle_attribute(particles, VEL_X), 
                             get_particle_attribute(particles, VEL_Y)))
+#1D array of brightnesses
 brightnesses = get_particle_attribute(particles, BRIGHTNESS)
 
-def distance(i, j): # smala r
+def distance(i, j): # Absolute distance from particle i to j
     return np.linalg.norm(distance_vector(i,j))    
 
-def distance_vector(i, j): # tjocka r
+def distance_vector(i, j): # Distance vector from between particle i and j
     return pos[i] - pos[j]
 
-def The_Force_Luke(i): #THE KRAAAAAAFT
-    sum_vec = np.zeros(2)
+def The_Force_Luke(i): # The force from all other particles onto i
     for j in range(N):
         if j != i:
-            #sum_vec += (m[j] / math.pow(distance(i, j) + EPSILON, 3)) * distance_vector(i,j)
             sum_vec += (m[j] / (distance(i, j) + EPSILON) ** 3) * distance_vector(i,j)
     return np.multiply(-G * m[i], sum_vec)
 
-def current_acc(i): # current is short for calulate acc is short for vroooooooom
+def current_acc(i): # The acceleration of particle i at the current time
     return np.divide(The_Force_Luke(i), m[i])
 
-def next_vel(i): # next is short for calulate vel is short for velocity
+def next_vel(i): # The velocity of particle i after one time step
     return vel[i] + np.multiply(TIMESTEP, current_acc(i))
 
-def next_pos(i): # next is short for calulate pos is short for possistion
+def next_pos(i): # The position of particle i after one time step
     return pos[i] + np.multiply(TIMESTEP, next_vel(i))
 
 
-#Simulate
+#PART 3: Simulation
 
-def step():
+def step(): #The global positions and velocities arrays are updated after one time step
     global pos, vel
     next_vel_arr = np.zeros([N, 2])
     next_pos_arr = np.zeros([N, 2])
@@ -102,9 +111,7 @@ def step():
     vel = next_vel_arr
     pos = next_pos_arr
 
-
-#Animate
-
+#Animates the movement of the particles
 def animate():
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.set_facecolor('black')
@@ -114,11 +121,7 @@ def animate():
     ax.set_aspect('equal')
 
     def update(frame):
-        global step_counter
-        start_time = time.time()
         step()
-        print("step", step_counter, "in",time.time()-start_time, "seconds")
-        step_counter += 1 
         scat.set_offsets(pos)
         return scat,
 
@@ -143,37 +146,36 @@ def animate():
     elif What_to_do == 2:
         plt.show()
 
-def just_run_it_bro():
+#Only runs the simulation
+def just_run_it():
     time_abs_start = time.time()
     for i in range(NUM_STEPS):
-        # print("now running step: ", i)
-        # time_start = time.time()
         step()
-        # time_end = time.time()
-        # time_took = time_end-time_start
-        # print("step 0 took ", time_took, " seconds")
     time_abs_end = time.time()
     print("total time: ", time_abs_end-time_abs_start)
 
-
 if What_to_do == 0:
-    just_run_it_bro()
+    just_run_it()
 else:
     animate()
 
 
-if compare_output:
-    out = np.column_stack((pos, m, vel, brightnesses))
-    #print("Output:")
-    #print(out)
+#PART 4: evaluating the results
 
-    #Compare output
+compare_gal_files_path = "Nbody/compare_gal_files/compare_gal_files"
+
+#Runs the provided C program for comparing outputs (compare_gal_files). 
+#Note that the program needs to be compiled to the compare_gal_files_path.
+if compare_output:
+    #"Reassemble" the values into the same format as the input file
+    out = np.column_stack((pos, m, vel, brightnesses))
 
     out.tofile(outputFile)
 
+    #Running the subprocess of comparing
     result = subprocess.run(
         [
-            "Nbody/compare_gal_files/compare_gal_files",
+            compare_gal_files_path,
             str(N),
             compareFile,
             outputFile
