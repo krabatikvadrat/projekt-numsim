@@ -8,22 +8,22 @@ from matplotlib.animation import FFMpegWriter
 #PART 0: Parameters of the simulation
 
 #Path to file to use as initial conditions
-inputFile = "Nbody/input_data/ellipse_N_00010.gal"
+inputFile = "Nbody/input_data/ellipse_N_03000.gal"
 #Name of the file to create containing the final set of vales
 outputFile = "outputs/out.gal"
 #Path to the file used to compare the output file with
-compareFile = "Nbody/ref_output_data/ellipse_N_00010_after200steps.gal"
+compareFile = "Nbody/ref_output_data/ellipse_N_03000_after100steps.gal"
 
 # If 0 just runs it
 # If 1 saves the animation as a mp4
 # IF 2 shows the animation
-What_to_do = 0
+What_to_do = 1
 
 # If the compare script shuld be run
 compare_output = True
 
 #The total number of steps to take
-NUM_STEPS = 200
+NUM_STEPS = 100
 # The time step in seconds
 TIMESTEP = 1e-5
 
@@ -84,6 +84,7 @@ def distance_vector(i, j): # Distance vector from between particle i and j
     return pos[i] - pos[j]
 
 def The_Force_Luke(i): # The force from all other particles onto i
+    sum_vec = np.zeros(2)
     for j in range(N):
         if j != i:
             sum_vec += (m[j] / (distance(i, j) + EPSILON) ** 3) * distance_vector(i,j)
@@ -121,7 +122,9 @@ def animate():
     ax.set_aspect('equal')
 
     def update(frame):
+        time_s = time.time()
         step()
+        print(time.time()-time_s)
         scat.set_offsets(pos)
         return scat,
 
@@ -150,7 +153,9 @@ def animate():
 def just_run_it():
     time_abs_start = time.time()
     for i in range(NUM_STEPS):
+        time_s = time.time()
         step()
+        print(time.time() - time_s)
     time_abs_end = time.time()
     print("total time: ", time_abs_end-time_abs_start)
 
