@@ -17,7 +17,7 @@ compareFile = "Nbody/ref_output_data/ellipse_N_03000_after100steps.gal"
 # If 0 just runs it
 # If 1 saves the animation as a mp4
 # IF 2 shows the animation
-What_to_do = 1
+What_to_do = 0
 
 # If the compare script shuld be run
 compare_output = True
