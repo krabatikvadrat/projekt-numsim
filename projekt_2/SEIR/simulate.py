@@ -13,7 +13,7 @@ Imune = 0
 X0 = (Susceptible, Exposed, Infected, Imune)
 
 N = Susceptible + Exposed + Infected + Imune
-alpha = 1/4
+alpha = 1/8
 gamma = 1/7
 beta = 0.3
 coeff= (N, gamma, beta, alpha)
@@ -46,10 +46,10 @@ plt.title("SEIR-Model, stochastic")
 plt.legend()
 
 plt.figure(2)
-plt.plot(sol.t,sol.y[0],"k-", label="Susceptible", linewidth=1)
-plt.plot(sol.t,sol.y[1],"k-", label="Exposed", linewidth=1)
-plt.plot(sol.t,sol.y[2],"k-", label="Infected", linewidth=1)
-plt.plot(sol.t,sol.y[3],"k-", label="Immune", linewidth=1)
+plt.plot(sol.t,sol.y[0],"y-", label="Susceptible")
+plt.plot(sol.t,sol.y[1],"m-", label="Exposed")
+plt.plot(sol.t,sol.y[2],"r-", label="Infected")
+plt.plot(sol.t,sol.y[3],"g-", label="Immune")
 ax2 = plt.gca()
 # xmin, xmax, ymin, ymax = ax2.axis()
 ax2.set(xlim=(0, xmax), ylim=(0, ymax))
